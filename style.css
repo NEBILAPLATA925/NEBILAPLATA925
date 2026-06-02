@@ -37,7 +37,24 @@
   .nav-icon svg{width:14px;height:14px;stroke:var(--principal);fill:none;stroke-width:1.5}
 
   /* HERO */
-  .hero{min-height:100vh;max-height:850px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--secciones) 0%,var(--cream) 60%)}
+  .hero {
+    height: 100vh;
+    min-height: 500px;
+    max-height: 750px; /* Este es el tope clave para matar el espacio en blanco */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--secciones) 0%, var(--cream) 60%);
+  }
+  .hero-content {
+    margin-top: 40px; /* Compensa un poco el espacio del NAV */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
   .hero-bg{position:absolute;inset:0;pointer-events:none}
   .hero-circle{position:absolute;border-radius:50%;opacity:0.18}
   .hc1{width:600px;height:600px;background:var(--fondo);top:-150px;right:-100px}
