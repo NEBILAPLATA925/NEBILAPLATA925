@@ -47,8 +47,8 @@ const SITE_CONFIG = {
   label:      "Hablemos",
   titulo:     "¿Buscás algo especial?",
   waDisplay:  "+54 351 2553298",           
-  waTexto:    "Hola! Vi su página y me gustaría consultar por sus productos.",
-  waTextoProducto: "Hola! Vi su página y me gustaría consultar por: *{nombre}*",
+  waTexto:    "Hola! Como estas? Me gustaria consultarte por tus productos!",
+  waTextoProducto: "Hola! Como estas? Me gustaria consultarte por: *{nombre}*",
   ctaTitulo:  "Encontrá tu estilo ideal",
   ctaParrafo: "Te ayudamos a elegir la joya perfecta para expresar tu estilo o celebrar un momento especial. Consultanos por diseños disponibles, combinaciones y asesoramiento personalizado.",
   ctaBoton:   "Escribinos por WhatsApp"
