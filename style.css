@@ -22,19 +22,22 @@
 
 
 
-  /* NAV */
-  nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(253,248,245,0.92);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--fondo);padding:0 2rem}
-  .nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
-  .nav-logo{font-family:var(--font-nav),serif;font-size:16px;font-weight:300;white-space: nowrap;gap: 6px !important;letter-spacing:1px;color:var(--text);text-transform:uppercase;cursor:pointer}
-  .nav-logo span{color:var(--principal);font-style:italic}
-  .nav-logo-img {height: 1.2em; width: 1.2em; object-fit: contain; background: transparent;}
-  .nav-links{display:flex;gap:2rem;list-style:none}
-  .nav-links a{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text-soft);text-decoration:none;cursor:pointer;transition:color .2s}
-  .nav-links a:hover{color:var(--principal)}
-  .nav-social{display:flex;gap:14px;align-items:center}
-  .nav-icon{width:32px;height:32px;border:0.5px solid var(--detalles);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;text-decoration:none}
-  .nav-icon:hover{background:var(--fondo)}
-  .nav-icon svg{width:14px;height:14px;stroke:var(--principal);fill:none;stroke-width:1.5}
+  @media (max-width: 768px) {
+    nav { padding: 0 10px !important; }
+    .nav-inner { height: 50px !important; }
+    .nav-logo { font-size: 11px !important; letter-spacing: 0px !important; }
+    .nav-logo-img { height: 1.1em !important; width: 1.1em !important; }
+    .nav-search-btn { padding: 4px 6px !important; font-size: 11px !important; }
+    .nav-social { gap: 6px !important; }
+    .nav-icon { 
+      width: 26px !important; 
+      height: 26px !important; 
+    }
+    .nav-icon svg { 
+      width: 12px !important; 
+      height: 12px !important; 
+    }
+  }
 
   /* HERO */
   .hero {
