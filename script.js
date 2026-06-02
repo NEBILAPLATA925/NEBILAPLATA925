@@ -963,6 +963,28 @@ function comprimirImagen(file, callback){
   reader.readAsDataURL(file);
 }
 
+// Igual que comprimirImagen pero exporta PNG para preservar transparencia (ej: logo hero)
+function comprimirImagenPNG(file, callback){
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 600;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+      if(h > MAX){ w = Math.round(w * MAX / h); h = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, w, h); // asegura fondo transparente
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/png'));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 // Mostrar/ocultar input de nueva categoría
 function toggleNuevaCat(){
   const wrap = document.getElementById('a-tipo-nueva-wrap');
@@ -1349,7 +1371,7 @@ let heroLogoImgPendiente = null;
 function cargarHeroLogo(e){
   const file = e.target.files[0];
   if(!file) return;
-  comprimirImagen(file, base64 => {
+  comprimirImagenPNG(file, base64 => {
     heroLogoImgPendiente = base64;
     document.getElementById('ep-hero-logo-thumb').src = base64;
     document.getElementById('ep-hero-logo-preview').style.display = 'block';
