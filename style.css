@@ -40,13 +40,25 @@
   .hero {
     height: 100vh;
     min-height: 500px;
-    max-height: 750px; /* Este es el tope clave para matar el espacio en blanco */
+    max-height: 750px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background: linear-gradient(135deg, var(--secciones) 0%, var(--cream) 60%);
+  }
+  /* Difuminado en la parte inferior del hero — suaviza el corte con la sección siguiente */
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 160px;
+    background: linear-gradient(to bottom, transparent 0%, var(--cream) 100%);
+    pointer-events: none;
+    z-index: 3;
   }
   .hero-content {
     margin-top: 40px; /* Compensa un poco el espacio del NAV */
@@ -55,16 +67,33 @@
     align-items: center;
     justify-content: center;
   }
-  .hero-bg{position:absolute;inset:0;pointer-events:none}
-  .hero-circle{position:absolute;border-radius:50%;opacity:0.18}
-  .hc1{width:600px;height:600px;background:var(--fondo);top:-150px;right:-100px}
-  .hc2{width:350px;height:350px;background:var(--detalles);bottom:-80px;left:-60px}
-  .hc3{width:200px;height:200px;background:var(--gold);top:40%;left:10%;opacity:0.08}
+  /* Fondo con círculos fijo detrás de toda la página */
+  .hero-bg{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .hero-circle{position:absolute;border-radius:50%;will-change:transform;filter:blur(2px)}
+  .hc1{width:650px;height:650px;background:var(--fondo);opacity:0.55;top:-150px;right:-100px}
+  .hc2{width:400px;height:400px;background:var(--detalles);opacity:0.25;bottom:-80px;left:-60px}
+  .hc3{width:220px;height:220px;background:var(--gold);opacity:0.07;top:40%;left:10%}
+  /* Todo el contenido va encima del fondo fijo */
+  #hero{position:relative;z-index:1}
+  #nosotros,#productos,#contacto,footer{position:relative;z-index:1}
+  #nosotros{background:linear-gradient(to bottom, var(--cream) 0%, var(--cream) 100%)}
+  /* Difuminado suave en la parte superior de nosotros para recibir el hero */
+  #nosotros::before{
+    content:'';
+    position:absolute;
+    top:-80px;
+    left:0;right:0;
+    height:80px;
+    background:linear-gradient(to bottom, transparent, var(--cream));
+    pointer-events:none;
+    z-index:2;
+  }
   .hero-content{position:relative;z-index:2;text-align:center;max-width:700px;padding:2rem}
   .hero-eyebrow{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--principal);margin-bottom:1rem;opacity:0;transform:translateY(14px);transition:opacity .72s ease, transform .72s ease}
+   #hero-eyebrow-2{margin-bottom:4.5rem}
   .hero-title{font-family:var(--font-titulo-pagina),serif;font-size:clamp(52px,8vw,88px);font-weight:300;line-height:1.05;color:var(--text);margin-bottom:1.2rem;opacity:0;transform:translateY(14px);transition:opacity .72s ease, transform .72s ease}
   .hero-title em{color:var(--principal);font-style:italic}
-  .hero-title-img-wrap{background:transparent;margin-bottom:3rem;opacity:0;transform:translateY(14px);transition:opacity .72s ease, transform .72s ease}
+  .hero-title-img-wrap{background:transparent;margin-bottom:4rem;opacity:0;transform:translateY(14px);transition:opacity .72s ease, transform .72s ease}
   .hero-title-img-wrap img{background:transparent;mix-blend-mode:multiply}
   .hero-subtitle{font-size:15px;font-weight:300;color:var(--text-soft);letter-spacing:1px;line-height:1.8;margin-bottom:3.5rem;opacity:0;transform:translateY(14px);transition:opacity .72s ease, transform .72s ease}
   .hero-cta{display:inline-flex;gap:1rem;flex-wrap:wrap;justify-content:center;opacity:0;transform:translateY(14px);transition:opacity .72s ease, transform .72s ease}

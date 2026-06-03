@@ -1787,3 +1787,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+
+// ════════════════════════════════════════════════════════
+//  PARALLAX HERO — los círculos se mueven al hacer scroll
+//  Cada círculo tiene una velocidad distinta (factor),
+//  creando sensación de profundidad. Sutil y elegante.
+// ════════════════════════════════════════════════════════
+(function iniciarParallax(){
+  // factor: qué tan rápido se mueve cada círculo
+  // positivo = baja más lento que el scroll (flota hacia arriba)
+  // negativo = sube más rápido (se aleja)
+  const capas = [
+    { selector: '.hc1', factor: 0.18 },  // grande, movimiento suave
+    { selector: '.hc2', factor: 0.28 },  // mediano, un poco más rápido
+    { selector: '.hc3', factor: 0.12 },  // pequeño, casi inmóvil
+  ];
+
+  const elementos = capas.map(c => ({
+    el: document.querySelector(c.selector),
+    factor: c.factor
+  })).filter(c => c.el);
+
+  let rafPending = false;
+
+  function aplicar(){
+    const scrollY = window.scrollY;
+    elementos.forEach(({ el, factor }) => {
+      el.style.transform = `translateY(${scrollY * factor}px)`;
+    });
+    rafPending = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if(!rafPending){
+      rafPending = true;
+      requestAnimationFrame(aplicar);
+    }
+  }, { passive: true });
+})();
