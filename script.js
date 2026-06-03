@@ -484,7 +484,7 @@ function animarHero(){
     document.getElementById('hero-title'),
     document.getElementById('hero-title-img-wrap'),
     document.getElementById('hero-subtitle'),
-    document.getElementById('hero-cta'),
+    document.querySelector('.hero-cta'),
     document.querySelector('.hero-scroll'),
   ].filter(Boolean);
 
