@@ -469,7 +469,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyConfig();
   inicializar();
   if(ADMIN_REQUEST){ pedirLoginAdmin(); }
+  animarHero();
 });
+
+// ════════════════════════════════════════════════════════
+//  ANIMACIÓN HERO — entrada única y armoniosa
+//  Espera a que la imagen del logo esté lista antes de
+//  arrancar, para que todo aparezca junto en cascada.
+// ════════════════════════════════════════════════════════
+function animarHero(){
+  const elementos = [
+    document.getElementById('hero-eyebrow-1'),
+    document.getElementById('hero-eyebrow-2'),
+    document.getElementById('hero-title'),
+    document.getElementById('hero-title-img-wrap'),
+    document.getElementById('hero-subtitle'),
+    document.getElementById('hero-cta'),
+    document.querySelector('.hero-scroll'),
+  ].filter(Boolean);
+
+  const DELAY_BASE  = 110; // ms entre cada elemento
+  const DELAY_START = 80;  // ms antes de arrancar
+
+  function disparar(){
+    let offset = DELAY_START;
+    elementos.forEach(el => {
+      if(el.style.display === 'none') return;
+      setTimeout(() => el.classList.add('hero-visible'), offset);
+      offset += DELAY_BASE;
+    });
+  }
+
+  // Si hay imagen en el hero, esperamos a que cargue antes de animar
+  const heroImg = document.getElementById('hero-title-img');
+  const imgWrap = document.getElementById('hero-title-img-wrap');
+  if(imgWrap && imgWrap.style.display !== 'none' && heroImg && heroImg.src && heroImg.src !== window.location.href){
+    if(heroImg.complete && heroImg.naturalWidth > 0){
+      disparar();
+    } else {
+      let fired = false;
+      const once = () => { if(!fired){ fired = true; disparar(); } };
+      heroImg.addEventListener('load',  once, { once: true });
+      heroImg.addEventListener('error', once, { once: true });
+      // Safety: si tarda más de 1.5s arrancamos igual
+      setTimeout(once, 1500);
+    }
+  } else {
+    disparar();
+  }
+}
 
 let resizeTimer;
 window.addEventListener('resize', () => {
