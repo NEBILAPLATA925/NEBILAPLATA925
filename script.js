@@ -513,29 +513,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch(e) {}
 
-  // Si no hay caché de config, esperar Firebase antes de animar el hero
-  // para evitar mostrar el texto y luego cambiarlo por la imagen
   applyConfig();
   if(ADMIN_REQUEST){ pedirLoginAdmin(); }
-  if(SITE_CONFIG._heroLogoImg) {
-    animarHero();
-  }
 
   // Firebase en segundo plano — no bloquea nada
   Promise.all([
     cargarConfigEditable().then(data => {
       if (data) {
         try { localStorage.setItem('config_cache', JSON.stringify(data)); } catch(e) {}
-        const teniaLogoAntes = !!SITE_CONFIG._heroLogoImg;
         applyConfig();
-        // Si llegó el logo por primera vez, reanimar el hero
-        if (!teniaLogoAntes && SITE_CONFIG._heroLogoImg) {
-          animarHero();
-        }
       }
     }),
     inicializar()
-  ]);
+  ]).then(() => {
+    animarHero();
+  });
 });
 
 // ════════════════════════════════════════════════════════
