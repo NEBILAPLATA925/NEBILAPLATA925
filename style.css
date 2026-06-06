@@ -1119,7 +1119,7 @@
   .modal-body { padding: 1.6rem; overflow-y: auto; flex: 1; }
   .modal-title { font-size: 26px; }
   .modal-desc { font-size: 13px; }
-  .whatsapp-btn { width: 100%; justify-content: center; }
+  .whatsapp-btn { width: 100%; justify-content: center; align-items: center; display: flex; }
 
   #modal-btns #modal-add-cart {
     width: 100% !important;
