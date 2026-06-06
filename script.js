@@ -513,10 +513,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch(e) {}
 
-  // Mostrar UI inmediatamente sin esperar Firebase
+  // Si no hay caché de config, esperar Firebase antes de animar el hero
+  // para evitar mostrar el texto y luego cambiarlo por la imagen
   applyConfig();
-  animarHero();
   if(ADMIN_REQUEST){ pedirLoginAdmin(); }
+  if(SITE_CONFIG._heroLogoImg) {
+    animarHero();
+  }
 
   // Firebase en segundo plano — no bloquea nada
   Promise.all([
