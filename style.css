@@ -1108,12 +1108,11 @@
   /* ── MODAL PRODUCTO ───────────────────────────── */
   .modal {
     grid-template-columns: 1fr;
-    max-height: 92vh;
-    border-radius: 8px;
-    height: 92vh;       
+    max-height: 75vh;
+    border-radius: 8px;       
     overflow: hidden; 
   }
-  .modal-img { height: 240px; min-height: unset; flex-shrink: 0; overflow: hidden; }
+  .modal-img { height: 220px; min-height: unset; flex-shrink: 0; overflow: hidden; }
   .modal-body { padding: 1.6rem; overflow-y: auto; flex: 1; }
   .modal-title { font-size: 26px; }
   .modal-desc { font-size: 13px; }
