@@ -583,8 +583,10 @@ function getCategorias(){
   return cats;
 }
 
+function esMobile(){ return window.innerWidth <= 768; }
+
 function visiblePorPantalla(){
-  if(window.innerWidth <= 768)  return 1;
+  if(esMobile())              return 4; // 4 cards por "página" en mobile (grilla 2x2)
   if(window.innerWidth <= 1024) return 2;
   return 3;
 }
@@ -726,15 +728,39 @@ function buildTrack(catId, prods){
   posCarrusel[catId]   = 0;
   track.innerHTML      = '';
 
-  prodsVisibles.forEach(p => {
-    const card = crearCard(p, false);
-    card.style.flex = `0 0 ${cardW}px`;
-    track.appendChild(card);
-  });
+  if(esMobile()){
+    // Agrupar de a 4 cards en grupos 2x2
+    const grupos = [];
+    for(let i = 0; i < prodsVisibles.length; i += 4){
+      grupos.push(prodsVisibles.slice(i, i + 4));
+    }
+    grupos.forEach(grupo => {
+      const grp = document.createElement('div');
+      grp.className = 'carrusel-grupo-mobile';
+      grp.style.flex = `0 0 ${cardW * 2 + 10}px`;
+      grp.style.display = 'grid';
+      grp.style.gridTemplateColumns = '1fr 1fr';
+      grp.style.gap = '8px';
+      grupo.forEach(p => {
+        const card = crearCard(p, false);
+        card.style.flex = '';
+        card.style.width = '100%';
+        grp.appendChild(card);
+      });
+      track.appendChild(grp);
+    });
+  } else {
+    prodsVisibles.forEach(p => {
+      const card = crearCard(p, false);
+      card.style.flex = `0 0 ${cardW}px`;
+      track.appendChild(card);
+    });
+  }
 
   const btnPrev = document.getElementById('btn-prev-' + catId);
   const btnNext = document.getElementById('btn-next-' + catId);
-  const ocultar = prodsVisibles.length <= visible;
+  const totalGrupos = esMobile() ? Math.ceil(prodsVisibles.length / 4) : prodsVisibles.length;
+  const ocultar = totalGrupos <= 1;
   if(btnPrev) btnPrev.style.display = ocultar ? 'none' : '';
   if(btnNext) btnNext.style.display = ocultar ? 'none' : '';
 }
@@ -794,11 +820,17 @@ function crearCard(p, esClonado){
 }
 
 function getCardWidth(){
-  const gap = 20;
-  const visible = visiblePorPantalla();
-  const padding = window.innerWidth <= 768 ? 48 : 128;
+  const gap = 10;
+  if(esMobile()){
+    // 2 columnas → cada card ocupa la mitad del contenedor menos el gap central
+    const padding = 48;
+    const containerW = window.innerWidth - padding;
+    return (containerW - gap) / 2;
+  }
+  const visibleN = visiblePorPantalla();
+  const padding = 128;
   const containerW = Math.min(window.innerWidth - padding, 1100);
-  return (containerW - gap * (visible - 1)) / visible;
+  return (containerW - gap * (visibleN - 1)) / visibleN;
 }
 
 function actualizarCarrusel(catId){
@@ -806,20 +838,35 @@ function actualizarCarrusel(catId){
   if(!track) return;
   const outer  = track.closest('.carrusel-track-outer');
   const cardW  = getCardWidth();
-  Array.from(track.children).forEach(c => c.style.flex = `0 0 ${cardW}px`);
-  if(outer) outer.scrollLeft = (posCarrusel[catId] || 0) * (cardW + 20);
+  if(esMobile()){
+    const grupoW = cardW * 2 + 10;
+    Array.from(track.children).forEach(c => { c.style.flex = `0 0 ${grupoW}px`; });
+    if(outer) outer.scrollLeft = (posCarrusel[catId] || 0) * (grupoW + 20);
+  } else {
+    Array.from(track.children).forEach(c => c.style.flex = `0 0 ${cardW}px`);
+    if(outer) outer.scrollLeft = (posCarrusel[catId] || 0) * (cardW + 20);
+  }
 }
 
 function moverCarrusel(catId, dir){
   const prods   = carruselProds[catId] || [];
   const visible = visiblePorPantalla();
-  if(prods.length <= visible) return;
+  // En mobile los items del track son grupos de 4, no cards individuales
+  const totalItems = esMobile() ? Math.ceil(prods.length / 4) : prods.length;
+  if(totalItems <= 1) return;
 
-  posCarrusel[catId] = Math.max(0, Math.min((posCarrusel[catId] || 0) + dir, prods.length - visible));
+  const maxPos = totalItems - 1;
+  posCarrusel[catId] = Math.max(0, Math.min((posCarrusel[catId] || 0) + dir, maxPos));
 
   const track = document.getElementById('carrusel-track-' + catId);
   const outer = track?.closest('.carrusel-track-outer');
-  if(outer) outer.scrollLeft = posCarrusel[catId] * (getCardWidth() + 20);
+  if(esMobile()){
+    const cardW  = getCardWidth();
+    const grupoW = cardW * 2 + 10;
+    if(outer) outer.scrollLeft = posCarrusel[catId] * (grupoW + 20);
+  } else {
+    if(outer) outer.scrollLeft = posCarrusel[catId] * (getCardWidth() + 20);
+  }
 }
 
 // ════════════════════════════════════════════════════════
