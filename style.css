@@ -1121,28 +1121,22 @@
   .modal-desc { font-size: 13px; }
   .whatsapp-btn { width: 100%; justify-content: center; align-items: center; display: flex; }
 
-  #modal-add-cart {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 8px !important;
-    margin: 0 !important;
-    font-size: 11px !important;
-    line-height: 1 !important;  /* ← agregá esta línea */
-  }
+  #modal-add-cart,
   #modal-wa {
     width: 100% !important;
     box-sizing: border-box !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 6px !important;
     margin: 0 !important;
-    font-size: 9px !important;
-    line-height: 1 !important;  /* ← agregá esta línea */
+    font-size: 10px !important;
+    letter-spacing: 1.5px !important;
+    line-height: 1 !important;
+    padding: 11px 8px !important;
+    white-space: nowrap !important;
   }
+  #modal-add-cart { margin-bottom: 8px !important; }
 
   /* ── CONTACTO ─────────────────────────────────── */
   .contacto-grid {
