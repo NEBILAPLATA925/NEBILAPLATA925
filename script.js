@@ -1989,3 +1989,121 @@ function enviarPedidoWa() {
   const url = `https://wa.me/${SITE_CONFIG.whatsapp}?text=${encodeURIComponent(mensaje)}`;
   window.open(url, '_blank');
 }
+// ════════════════════════════════════════════════════════════════
+//  MENÚ HAMBURGUESA (mobile) + DROPDOWN DESKTOP (categorías)
+// ════════════════════════════════════════════════════════════════
+
+function initDropdownListeners() {
+  // El dropdown ahora es puro CSS :hover — no necesita JS para abrirse/cerrarse.
+  // Solo necesitamos poblar las categorías la primera vez que se hace hover.
+  const li = document.getElementById('nav-productos-li');
+  if (!li) return;
+  let built = false;
+  li.addEventListener('mouseenter', () => {
+    if (!built) { buildNavCategoryMenus(); built = true; }
+  });
+}
+
+function buildNavCategoryMenus() {
+  const cats = getCategorias().filter(c => !categoriasOcultas.includes(c));
+
+  // ── Desktop dropdown ──
+  const desktopEl = document.getElementById('nav-dropdown-cats');
+  if (desktopEl) {
+    desktopEl.innerHTML = '';
+    cats.forEach(cat => {
+      const a = document.createElement('a');
+      a.className = 'nav-dropdown-item';
+      a.textContent = cat;
+      a.addEventListener('click', () => irACategoria(cat));
+      desktopEl.appendChild(a);
+    });
+  }
+
+  // ── Mobile menu ──
+  const mobileEl = document.getElementById('mobile-menu-cats');
+  if (mobileEl) {
+    mobileEl.innerHTML = '';
+    cats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'mobile-menu-cat-item';
+      btn.textContent = cat;
+      btn.addEventListener('click', () => { closeMobileMenu(); irACategoria(cat); });
+      mobileEl.appendChild(btn);
+    });
+  }
+}
+
+function closeDesktopDropdown() {
+  // No-op: el dropdown se cierra solo con CSS :hover
+}
+
+function irACategoria(catName) {
+  const sectionId = 'section-' + getCatId(catName);
+  const section = document.getElementById(sectionId);
+  if (section) {
+    const navH = document.querySelector('nav')?.offsetHeight || 60;
+    const top = section.getBoundingClientRect().top + window.scrollY - navH - 12;
+    window.scrollTo({ top, behavior: 'smooth' });
+  } else {
+    scrollToSection('productos');
+    setTimeout(() => irACategoria(catName), 600);
+  }
+}
+
+function irATodosLosProductos() {
+  const section = document.getElementById('section-todos');
+  if (section) {
+    const navH = document.querySelector('nav')?.offsetHeight || 60;
+    const top = section.getBoundingClientRect().top + window.scrollY - navH - 12;
+    window.scrollTo({ top, behavior: 'smooth' });
+  } else {
+    scrollToSection('productos');
+  }
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const btn = document.getElementById('nav-hamburger');
+  const isOpen = menu.classList.contains('active');
+  if (isOpen) {
+    closeMobileMenu();
+  } else {
+    buildNavCategoryMenus();
+    menu.classList.add('active');
+    overlay.classList.add('active');
+    btn.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const btn = document.getElementById('nav-hamburger');
+  menu.classList.remove('active');
+  overlay.classList.remove('active');
+  btn.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Inicializar listeners del dropdown cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDropdownListeners);
+} else {
+  initDropdownListeners();
+}
+
+// Hook sobre buildAllCarousels para reconstruir los menús
+(function patchBuildAll() {
+  const origFn = window.buildAllCarousels;
+  if (origFn) {
+    window.buildAllCarousels = function() {
+      origFn.apply(this, arguments);
+      setTimeout(buildNavCategoryMenus, 200);
+    };
+  }
+})();
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });

@@ -44,12 +44,39 @@
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
+    <!-- Hamburger (solo mobile) -->
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()" title="Menú" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+
     <div class="nav-logo" id="nav-logo" onclick="scrollToSection('hero')">
       <!-- Llenado por applyConfig() desde config.js -->
     </div>
     <ul class="nav-links">
       <li><a onclick="scrollToSection('nosotros')">Nosotros</a></li>
-      <li><a onclick="scrollToSection('productos')">Productos</a></li>
+      <li class="nav-has-dropdown" id="nav-productos-li">
+        <a onclick="scrollToSection('productos')" class="nav-productos-link">
+          Productos
+          <svg class="nav-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>
+        </a>
+        <!-- Bridge invisible que evita que el dropdown se cierre al pasar el mouse -->
+        <div class="nav-dropdown-bridge" id="nav-dropdown-bridge"></div>
+        <div class="nav-dropdown" id="nav-dropdown-desktop">
+          <div class="nav-dropdown-header">
+            <span class="nav-dropdown-header-label">Categorías</span>
+            <div class="nav-dropdown-header-line"></div>
+          </div>
+          <div class="nav-dropdown-inner" id="nav-dropdown-cats">
+            <!-- Categorías cargadas por JS -->
+          </div>
+          <div class="nav-dropdown-footer">
+            <a class="nav-dropdown-footer-link" onclick="irATodosLosProductos()">
+              Ver todos los productos
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </li>
       <li><a onclick="scrollToSection('contacto')">Contacto</a></li>
     </ul>
     <div class="nav-social">
@@ -84,6 +111,22 @@
     </div>
   </div>
 </nav>
+
+<!-- MOBILE MENU DRAWER -->
+<div class="mobile-menu-overlay" id="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-menu-header">
+    <span class="mobile-menu-title">Categorías</span>
+    <button class="mobile-menu-close" onclick="closeMobileMenu()">✕</button>
+  </div>
+  <div class="mobile-menu-cats" id="mobile-menu-cats">
+    <!-- Cargado por JS -->
+  </div>
+  <div class="mobile-menu-footer">
+    <a onclick="scrollToSection('nosotros'); closeMobileMenu()">Nosotros</a>
+    <a onclick="scrollToSection('contacto'); closeMobileMenu()">Contacto</a>
+  </div>
+</div>
 
 <!-- HERO -->
 <div id="hero" style="position:relative">
