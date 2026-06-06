@@ -2024,6 +2024,17 @@ function buildNavCategoryMenus() {
   const mobileEl = document.getElementById('mobile-menu-cats');
   if (mobileEl) {
     mobileEl.innerHTML = '';
+    // "Todos los productos" primero
+    const btnTodos = document.createElement('button');
+    btnTodos.className = 'mobile-menu-cat-item mobile-menu-cat-todos';
+    btnTodos.textContent = 'Todos los productos';
+    btnTodos.addEventListener('click', () => { closeMobileMenu(); irATodosLosProductos(); });
+    mobileEl.appendChild(btnTodos);
+    // Separador
+    const sep = document.createElement('div');
+    sep.className = 'mobile-menu-cat-sep';
+    mobileEl.appendChild(sep);
+    // Categorías individuales
     cats.forEach(cat => {
       const btn = document.createElement('button');
       btn.className = 'mobile-menu-cat-item';
