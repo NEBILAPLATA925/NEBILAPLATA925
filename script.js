@@ -496,9 +496,9 @@ async function inicializar(){
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Aplicar config desde caché inmediatamente si existe
-  const configCache = localStorage.getItem('config_cache');
-  if (configCache) {
-    try {
+  try {
+    const configCache = localStorage.getItem('config_cache');
+    if (configCache) {
       const data = JSON.parse(configCache);
       if(data.rubro)         SITE_CONFIG.rubro         = data.rubro;
       if(data.ubicacion)     SITE_CONFIG.ubicacion      = data.ubicacion;
@@ -510,12 +510,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       if(data.nosotrosImg)   SITE_CONFIG._nosotrosImg    = data.nosotrosImg;
       if(data.heroLogoImg)   SITE_CONFIG._heroLogoImg    = data.heroLogoImg;
       if(data.navLogoImg)    SITE_CONFIG._navLogoImg     = data.navLogoImg;
-    } catch(e) {}
-  }
-  applyConfig();
+    }
+  } catch(e) {}
 
-  // Cargar Firebase en paralelo (config + productos al mismo tiempo)
-  await Promise.all([
+  // Mostrar UI inmediatamente sin esperar Firebase
+  applyConfig();
+  animarHero();
+  if(ADMIN_REQUEST){ pedirLoginAdmin(); }
+
+  // Firebase en segundo plano — no bloquea nada
+  Promise.all([
     cargarConfigEditable().then(data => {
       if (data) {
         try { localStorage.setItem('config_cache', JSON.stringify(data)); } catch(e) {}
@@ -523,9 +527,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }),
     inicializar()
-  ]);      
-  if(ADMIN_REQUEST){ pedirLoginAdmin(); }
-  animarHero();
+  ]);
 });
 
 // ════════════════════════════════════════════════════════
