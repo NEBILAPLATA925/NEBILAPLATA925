@@ -956,8 +956,142 @@ function closeModal(e){
   if(e.target === document.getElementById('modal')){
     document.getElementById('modal').classList.remove('active');
     document.body.style.overflow = '';
+    resetModalZoom();
   }
 }
+
+// ════════════════════════════════════════════════════════
+//  ZOOM EN IMAGEN DEL MODAL
+//  — Desktop: rueda del mouse sobre la imagen
+//  — Mobile:  gesto pinch (dos dedos) sobre la imagen
+// ════════════════════════════════════════════════════════
+const ZOOM_MIN   = 1;
+const ZOOM_MAX   = 4;
+const ZOOM_STEP  = 0.15;
+
+let zoomState = {
+  scale:    1,
+  originX:  50,   // % dentro de la imagen
+  originY:  50,
+  // pinch
+  lastDist: null,
+};
+
+function getActiveModalImg(){
+  const container = document.getElementById('modal-img');
+  if(!container) return null;
+  // Carrusel múltiple
+  const active = container.querySelector('img.active');
+  if(active) return active;
+  // Imagen única
+  return container.querySelector('img');
+}
+
+function applyZoom(){
+  const img = getActiveModalImg();
+  if(!img) return;
+  img.style.transformOrigin = `${zoomState.originX}% ${zoomState.originY}%`;
+  img.style.transform       = `scale(${zoomState.scale})`;
+  img.style.transition      = 'transform 0.12s ease';
+  img.style.cursor          = zoomState.scale > 1 ? 'zoom-out' : 'zoom-in';
+}
+
+function resetModalZoom(){
+  zoomState.scale   = 1;
+  zoomState.originX = 50;
+  zoomState.originY = 50;
+  zoomState.lastDist = null;
+  const img = getActiveModalImg();
+  if(img){
+    img.style.transform       = 'scale(1)';
+    img.style.transformOrigin = '50% 50%';
+    img.style.cursor          = '';
+  }
+}
+
+// Calcular origen del zoom relativo a la imagen
+function calcOrigin(e, img){
+  const rect = img.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width)  * 100;
+  const y = ((e.clientY - rect.top)  / rect.height) * 100;
+  return {
+    x: Math.max(0, Math.min(100, x)),
+    y: Math.max(0, Math.min(100, y)),
+  };
+}
+
+// ── Desktop: wheel ──────────────────────────────────────
+document.addEventListener('wheel', function(e){
+  const container = document.getElementById('modal-img');
+  if(!container || !container.contains(e.target)) return;
+
+  const img = getActiveModalImg();
+  if(!img) return;
+
+  e.preventDefault();
+
+  const delta = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP;
+  const newScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoomState.scale + delta));
+
+  if(newScale !== zoomState.scale){
+    const origin = calcOrigin(e, img);
+    zoomState.originX = origin.x;
+    zoomState.originY = origin.y;
+    zoomState.scale   = newScale;
+  }
+  applyZoom();
+}, { passive: false });
+
+// ── Mobile: pinch ───────────────────────────────────────
+document.addEventListener('touchstart', function(e){
+  const container = document.getElementById('modal-img');
+  if(!container || !container.contains(e.target)) return;
+  if(e.touches.length === 2){
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    zoomState.lastDist = Math.hypot(dx, dy);
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', function(e){
+  const container = document.getElementById('modal-img');
+  if(!container || !container.contains(e.target)) return;
+  if(e.touches.length !== 2 || zoomState.lastDist === null) return;
+
+  e.preventDefault();
+
+  const dx = e.touches[0].clientX - e.touches[1].clientX;
+  const dy = e.touches[0].clientY - e.touches[1].clientY;
+  const dist = Math.hypot(dx, dy);
+
+  const ratio    = dist / zoomState.lastDist;
+  const newScale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoomState.scale * ratio));
+
+  // Origen = punto medio entre los dos dedos
+  const img = getActiveModalImg();
+  if(img){
+    const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    const rect = img.getBoundingClientRect();
+    zoomState.originX = Math.max(0, Math.min(100, ((mx - rect.left) / rect.width)  * 100));
+    zoomState.originY = Math.max(0, Math.min(100, ((my - rect.top)  / rect.height) * 100));
+  }
+
+  zoomState.scale   = newScale;
+  zoomState.lastDist = dist;
+  applyZoom();
+}, { passive: false });
+
+document.addEventListener('touchend', function(e){
+  if(e.touches.length < 2) zoomState.lastDist = null;
+}, { passive: true });
+
+// Resetear zoom al cambiar de foto en el carrusel del modal
+const _origModalCarouselGo = window.modalCarouselGo;
+window.modalCarouselGo = function(idx){
+  resetModalZoom();
+  _origModalCarouselGo(idx);
+};
 
 document.querySelector('.modal-close').addEventListener('click', () => {
   document.getElementById('modal').classList.remove('active');
