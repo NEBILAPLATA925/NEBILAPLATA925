@@ -131,5 +131,12 @@ const SITE_CONFIG = {
   // ── CATÁLOGO INICIAL / RESTAURACIÓN ────────────────────────────
   // Estos son los productos que se cargan si Firebase está vacío
   // o cuando el admin presiona "Restaurar originales"
+  // ── IMÁGENES POR DEFECTO (hardcodeadas) ───────────────────────
+  // Se usan en la primera visita, antes de que Firebase responda.
+  // Si el admin sube una imagen nueva desde el panel, se sobreescribe
+  // y se guarda en caché — igual que los productos.
+  heroLogoImgDefault: "https://github.com/NABILAPLATA925/NABILAPLATA925/blob/main/img/LOGO3.png?raw=true",
+  navLogoImgDefault:  null,
+
   productosDefault: []
 };

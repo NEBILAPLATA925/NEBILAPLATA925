@@ -97,8 +97,9 @@ function applyConfig() {
 
   // ── NAV ──────────────────────────────────────────────
   const navLogoContainer = document.getElementById('nav-logo');
-  if (C._navLogoImg) {
-    navLogoContainer.innerHTML = `<img src="${C._navLogoImg}" class="nav-logo-img" alt="Logo"> ${C.marcaPrincipal} <span>${C.marcaItalica}</span>`;
+  const navLogoSrc = C._navLogoImg || C.navLogoImgDefault || null;
+  if (navLogoSrc) {
+    navLogoContainer.innerHTML = `<img src="${navLogoSrc}" class="nav-logo-img" alt="Logo"> ${C.marcaPrincipal} <span>${C.marcaItalica}</span>`;
   } else {
     navLogoContainer.innerHTML = `${C.marcaPrincipal} <span>${C.marcaItalica}</span>`;
   }
@@ -119,10 +120,11 @@ function applyConfig() {
   const heroTitleText = document.getElementById('hero-title');
   const heroTitleImgWrap = document.getElementById('hero-title-img-wrap');
   const heroTitleImg = document.getElementById('hero-title-img');
-  if(C._heroLogoImg){
+  const heroLogoSrc = C._heroLogoImg || C.heroLogoImgDefault || null;
+  if(heroLogoSrc){
     heroTitleText.style.display = 'none';
     heroTitleImgWrap.style.display = 'block';
-    heroTitleImg.src = C._heroLogoImg;
+    heroTitleImg.src = heroLogoSrc;
   } else {
     heroTitleImgWrap.style.display = 'none';
     heroTitleText.style.display = '';
@@ -517,14 +519,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   if(ADMIN_REQUEST){ pedirLoginAdmin(); }
 
   // Hero anima INMEDIATAMENTE — no espera Firebase para nada
-  // Primera visita: usa config.js; visitas siguientes: usa caché (ya aplicado arriba)
   animarHero();
 
   // Firebase carga en segundo plano, nunca bloquea la UI ni la animación
   cargarConfigEditable().then(data => {
     if (data) {
       try { localStorage.setItem('config_cache', JSON.stringify(data)); } catch(e) {}
-      applyConfig(); // actualiza textos/logo si cambiaron en el admin
+      applyConfig();
     }
   }).catch(() => {});
 
@@ -537,6 +538,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 //  arrancar, para que todo aparezca junto en cascada.
 // ════════════════════════════════════════════════════════
 function animarHero(){
+  const DELAY_BASE  = 110; // ms entre cada elemento
+  const DELAY_START = 80;  // ms antes de arrancar
+
+  // Animar TODOS los elementos de inmediato — sin esperar la imagen
+  // El hero-title-img-wrap arranca invisible (opacity:0) y aparece
+  // solo cuando la imagen termina de cargar gracias al listener abajo
   const elementos = [
     document.getElementById('hero-eyebrow-1'),
     document.getElementById('hero-eyebrow-2'),
@@ -547,33 +554,22 @@ function animarHero(){
     document.querySelector('.hero-scroll'),
   ].filter(Boolean);
 
-  const DELAY_BASE  = 110; // ms entre cada elemento
-  const DELAY_START = 80;  // ms antes de arrancar
+  const visibles = elementos.filter(el => el.style.display !== 'none');
+  visibles.forEach((el, i) => {
+    setTimeout(() => el.classList.add('hero-visible'), DELAY_START + i * DELAY_BASE);
+  });
 
-  function disparar(){
-    // Filtramos primero los visibles para que el offset sea continuo sin huecos
-    const visibles = elementos.filter(el => el.style.display !== 'none');
-    visibles.forEach((el, i) => {
-      setTimeout(() => el.classList.add('hero-visible'), DELAY_START + i * DELAY_BASE);
-    });
-  }
-
-  // Si hay imagen en el hero, esperamos a que cargue antes de animar
+  // Si la imagen aún no cargó, la mantenemos invisible hasta que esté lista
+  // y la hacemos aparecer con la transición CSS (sin bloquear nada)
   const heroImg = document.getElementById('hero-title-img');
   const imgWrap = document.getElementById('hero-title-img-wrap');
-  if(imgWrap && imgWrap.style.display !== 'none' && heroImg && heroImg.src && heroImg.src !== window.location.href){
-    if(heroImg.complete && heroImg.naturalWidth > 0){
-      disparar();
-    } else {
-      let fired = false;
-      const once = () => { if(!fired){ fired = true; disparar(); } };
-      heroImg.addEventListener('load',  once, { once: true });
-      heroImg.addEventListener('error', once, { once: true });
-      // Safety: si tarda más de 400ms arrancamos igual (no bloqueamos por la imagen)
-      setTimeout(once, 400);
+  if(imgWrap && heroImg && heroImg.src && heroImg.src !== window.location.href){
+    if(!(heroImg.complete && heroImg.naturalWidth > 0)){
+      imgWrap.style.opacity = '0';
+      const mostrar = () => { imgWrap.style.opacity = ''; };
+      heroImg.addEventListener('load',  mostrar, { once: true });
+      heroImg.addEventListener('error', mostrar, { once: true });
     }
-  } else {
-    disparar();
   }
 }
 
