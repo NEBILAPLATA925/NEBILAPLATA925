@@ -560,11 +560,15 @@ function animarHero(){
   const DELAY_START = 80;
 
   // Anima TODO de inmediato — sin esperar la imagen del logo
+  const heroImg = document.getElementById('hero-title-img');
+  const imgWrap = document.getElementById('hero-title-img-wrap');
+
+  // Elementos sin la imagen — animan siempre con stagger normal
   const elementos = [
     document.getElementById('hero-eyebrow-1'),
     document.getElementById('hero-eyebrow-2'),
     document.getElementById('hero-title'),
-    document.getElementById('hero-title-img-wrap'),
+    // imgWrap se maneja aparte ↓
     document.getElementById('hero-subtitle'),
     document.querySelector('.hero-cta'),
     document.querySelector('.hero-scroll'),
@@ -575,16 +579,23 @@ function animarHero(){
     setTimeout(() => el.classList.add('hero-visible'), DELAY_START + i * DELAY_BASE);
   });
 
-  // Si la imagen aún no cargó, la mantenemos invisible y aparece sola
-  // con la transición CSS cuando termina — sin bloquear nada
-  const heroImg = document.getElementById('hero-title-img');
-  const imgWrap = document.getElementById('hero-title-img-wrap');
-  if(imgWrap && heroImg && heroImg.src && heroImg.src !== window.location.href){
-    if(!(heroImg.complete && heroImg.naturalWidth > 0)){
-      imgWrap.style.opacity = '0';
-      const mostrar = () => { imgWrap.style.opacity = ''; };
-      heroImg.addEventListener('load',  mostrar, { once: true });
-      heroImg.addEventListener('error', mostrar, { once: true });
+  // imgWrap: espera a que la imagen cargue para disparar la animación junto con ella
+  if(imgWrap && imgWrap.style.display !== 'none'){
+    // Posición natural en el stagger (después del hero-title, antes del subtitle)
+    const staggerDelay = DELAY_START + 2 * DELAY_BASE;
+    const revelar = () => { imgWrap.classList.add('hero-visible'); };
+    if(heroImg && heroImg.src && heroImg.src !== window.location.href){
+      if(heroImg.complete && heroImg.naturalWidth > 0){
+        // Ya cargó (caché) — anima en su lugar normal
+        setTimeout(revelar, staggerDelay);
+      } else {
+        // Aún no cargó — espera el evento y anima entonces
+        const onLoad = () => { setTimeout(revelar, 80); };
+        heroImg.addEventListener('load',  onLoad, { once: true });
+        heroImg.addEventListener('error', onLoad, { once: true }); // fallback si falla
+      }
+    } else {
+      setTimeout(revelar, staggerDelay);
     }
   }
 }
