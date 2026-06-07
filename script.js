@@ -1121,20 +1121,25 @@ function moverCarrusel(catId, dir){
   }
 
   // Trigger lazy load: si estamos cerca del final del track, cargar más productos
-  const catNombre = Object.keys(carruselProds).includes(catId)
-    ? (() => {
-        // Recuperar el nombre real de categoría desde el catId
-        const cats = getCategorias();
-        return cats.find(c => getCatId(c) === catId) || null;
-      })()
-    : null;
-  if(catNombre && catNombre !== 'todos'){
+  // Para "todos", el catNombre es el propio catId
+  const catNombre = catId === 'todos'
+    ? 'todos'
+    : (Object.keys(carruselProds).includes(catId)
+        ? (() => {
+            const cats = getCategorias();
+            return cats.find(c => getCatId(c) === catId) || null;
+          })()
+        : null);
+  if(catNombre){
     const totalProds  = carruselProds[catId]?.length || 0;
     const totalGrupos = esMobile() ? Math.ceil(totalProds / 4) : totalProds;
     const posActual   = posCarrusel[catId] || 0;
-    // Cargar más cuando quedan ≤1 grupo/card para llegar al final
     if(totalGrupos - posActual <= 2){
-      cargarMasEnCategoria(catNombre);
+      if(catId === 'todos'){
+        cargarMasEnTodos();
+      } else {
+        cargarMasEnCategoria(catNombre);
+      }
     }
   }
 }
