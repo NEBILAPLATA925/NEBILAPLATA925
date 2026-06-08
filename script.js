@@ -229,7 +229,6 @@ async function cargarDesdeFirebase(){
       const localTs  = Number(localStorage.getItem('cache_ts') || '0');
       if(serverTs > localTs){
         try {
-          localStorage.removeItem('productos_cache');
           localStorage.removeItem('meta_cache');
           localStorage.removeItem('config_cache');
         } catch(e) {}
@@ -529,7 +528,7 @@ async function guardarEnFirebase(){
     const ts = Date.now();
     await META_REF.set({ lastModified: ts }, { merge: true });
     try {
-      localStorage.setItem('productos_cache', JSON.stringify(productos));
+      // No se cachean productos — siempre se leen frescos desde Firestore
       localStorage.setItem('cache_ts', String(ts));
     } catch(e) {}
     return true;
@@ -616,38 +615,21 @@ async function inicializar(){
     }
   } catch(e) {}
 
-  const cache = localStorage.getItem('productos_cache');
-  if (cache) {
-    try {
-      productos = JSON.parse(cache);
-      const loadingEl = document.getElementById('carrusel-loading');
-      if (loadingEl) loadingEl.style.display = 'none';
-      buildAllCarousels();
-    } catch(e) {}
-  }
-
+  // Productos: siempre desde Firestore (sin caché) para garantizar datos actualizados
+  // en cualquier dispositivo sin necesidad de borrar datos del navegador.
   try {
-    // cargarDesdeFirebase() puede invalidar el caché si detecta un lastModified más nuevo
     productos = await cargarDesdeFirebase();
     productos.forEach((p, i) => {
       if(!p.id){
         p.id = 'prod_' + Date.now() + '_' + i + '_' + Math.random().toString(36).slice(2,8);
       }
     });
-    // Guardar productos y metadata en caché para próxima carga instantánea y correcta
+    // Guardar metadata en caché (no los productos) para el orden de categorías
     try {
-      localStorage.setItem('productos_cache', JSON.stringify(productos));
       localStorage.setItem('meta_cache', JSON.stringify({
         categoriasOcultas, categoriaOrden, ordenCategorias, productosOcultos
       }));
     } catch(e) {}
-
-    // Redibujar si Firebase trajo algo distinto al caché (o si el caché fue invalidado)
-    if (!cache || cache !== JSON.stringify(productos)) {
-      const loadingEl = document.getElementById('carrusel-loading');
-      if (loadingEl) loadingEl.style.display = 'none';
-      buildAllCarousels();
-    }
 
   } catch(err){
     console.warn('Primer intento fallido, reintentando...', err);
@@ -655,7 +637,6 @@ async function inicializar(){
       await new Promise(r => setTimeout(r, 1200));
       productos = await cargarDesdeFirebase();
       try {
-        localStorage.setItem('productos_cache', JSON.stringify(productos));
         localStorage.setItem('meta_cache', JSON.stringify({
           categoriasOcultas, categoriaOrden, ordenCategorias, productosOcultos
         }));
@@ -1334,7 +1315,6 @@ async function eliminarProducto(p){
   try {
     if(p.id) await eliminarProductoEnFirebase(p.id);
     await guardarMetaEnFirebase();
-    try { localStorage.setItem('productos_cache', JSON.stringify(productos)); } catch(e) {}
     mostrarToast('Producto eliminado ✓');
   } catch(err) {
     console.error('Error eliminando producto:', err);
@@ -1593,7 +1573,6 @@ async function guardarProducto(){
     const prodTarget = productoEditando || productos[productos.length - 1];
     await guardarProductoEnFirebase(prodTarget);
     await guardarMetaEnFirebase();
-    try { localStorage.setItem('productos_cache', JSON.stringify(productos)); } catch(e) {}
     mostrarToast('Producto guardado ✓');
     setTimeout(() => scrollToSection('productos'), 300);
   } catch(err) {
