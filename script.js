@@ -1575,7 +1575,6 @@ async function guardarProducto(){
 
   if(!nombre)    { alert('Por favor ingresá el nombre del producto.'); return; }
   if(!tiposSeleccionados.length){ alert('Por favor seleccioná al menos una categoría.'); return; }
-  if(!desc)      { alert('Por favor escribí una descripción.'); return; }
   if(!fotosBase64.length){ alert('Por favor subí al menos una foto del producto.'); return; }
 
   const reordenadas = [fotosBase64[portadaIdx], ...fotosBase64.filter((_,i)=>i!==portadaIdx)];
