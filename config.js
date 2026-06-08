@@ -94,7 +94,7 @@ const SITE_CONFIG = {
     cuerpo:          "Inter",
 
     // Logo en el nav (marca del negocio)
-    nav:             "Cormorant Garamond",
+    nav:             "EB Garamond",
 
     // Título grande en el hero (nombre de la marca)
     tituloPagina:    "Pinyon Script",

@@ -397,7 +397,7 @@
 
   /* FOOTER */
   footer{background:var(--text);padding:3rem 2rem;text-align:center}
-  .footer-logo{font-family:var(--font-titulo-seccion),serif;font-size:28px;font-weight:300;letter-spacing:4px;color:white;text-transform:uppercase;margin-bottom:0.5rem}
+  .footer-logo{font-family:var(--font-nav),serif;font-size:28px;font-weight:300;letter-spacing:4px;color:white;text-transform:uppercase;margin-bottom:0.5rem}
   .footer-logo span{color:var(--fondo);font-style:italic}
   .footer-tagline{font-size:11px;letter-spacing:3px;color:var(--detalles);text-transform:uppercase;margin-bottom:2rem}
   .footer-social{display:flex;justify-content:center;gap:1rem;margin-bottom:2rem}
