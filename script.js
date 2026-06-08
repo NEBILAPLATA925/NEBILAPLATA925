@@ -508,6 +508,11 @@ async function guardarMetaEnFirebase(){
     productosOcultos,
     categorias: cats
   });
+  try {
+    localStorage.setItem('meta_cache', JSON.stringify({
+      categoriasOcultas, categoriaOrden, ordenCategorias, productosOcultos
+    }));
+  } catch(e) {}
 }
 
 // Guarda/actualiza UN producto en su propio documento
@@ -560,6 +565,7 @@ async function guardarEnFirebase(){
     });
 
     await batch.commit();
+    try { localStorage.setItem('productos_cache', JSON.stringify(productos)); } catch(e) {}
     return true;
   } catch(err) {
     console.error('Error guardando en Firebase:', err);
@@ -1350,6 +1356,7 @@ async function eliminarProducto(p){
   try {
     if(p.id) await eliminarProductoEnFirebase(p.id);
     await guardarMetaEnFirebase();
+    try { localStorage.setItem('productos_cache', JSON.stringify(productos)); } catch(e) {}
     mostrarToast('Producto eliminado ✓');
   } catch(err) {
     console.error('Error eliminando producto:', err);
@@ -1608,6 +1615,7 @@ async function guardarProducto(){
     const prodTarget = productoEditando || productos[productos.length - 1];
     await guardarProductoEnFirebase(prodTarget);
     await guardarMetaEnFirebase();
+    try { localStorage.setItem('productos_cache', JSON.stringify(productos)); } catch(e) {}
     mostrarToast('Producto guardado ✓');
     setTimeout(() => scrollToSection('productos'), 300);
   } catch(err) {
